@@ -1,0 +1,1 @@
+## Installation```stMetacello new	repository: 'github://kyurivlis/uFork-gt:main/src';	baseline: 'UForkGt';	load```## Load Lepiter				After installing with Metacello, you will be able to execute```#BaselineOfUForkGt asClass loadLepiter```

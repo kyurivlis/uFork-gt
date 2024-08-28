@@ -1,90 +1,90 @@
 Extension { #name : #SmallInteger }
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> direct [
 	"This method was automatically generated"
 	^ self bitAt:30
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> isDirect [
 	"This method was automatically generated"
 	^ self & 2147483648 ~= 0
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> isMutable [
 	"This method was automatically generated"
 	^ self & 1073741824 ~= 0
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> isNotDirect [
 	"This method was automatically generated"
 	^ self & -2147483649 ~= 0
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> isNotMutable [
 	"This method was automatically generated"
 	^ self & -1073741825 ~= 0
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> isNotOpaque [
 	"This method was automatically generated"
 	^ self & -536870913 ~= 0
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> isOpaque [
 	"This method was automatically generated"
 	^ self & 536870912 ~= 0
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> mutable [
 	"This method was automatically generated"
 	^ self bitAt:31
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> opaque [
 	"This method was automatically generated"
 	^ self bitAt:32
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> setDirect [
 	"This method was automatically generated"
 	^self & 2147483648
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> setMutable [
 	"This method was automatically generated"
 	^self & 1073741824
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> setNotDirect [
 	"This method was automatically generated"
 	^self & -2147483649
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> setNotMutable [
 	"This method was automatically generated"
 	^self & -1073741825
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> setNotOpaque [
 	"This method was automatically generated"
 	^self & -536870913
 ]
 
-{ #category : #'*UForkGT' }
+{ #category : #'*UForkGt' }
 SmallInteger >> setOpaque [
 	"This method was automatically generated"
 	^self & 536870912

@@ -14,3 +14,11 @@ QuadCell class >> new [
 QuadCell class >> new: aNum [
 	^self shouldNotImplement
 ]
+
+{ #category : #example }
+QuadCell class >> valueTypeHierarchy [
+	<gtExample>
+	|m|
+	m:= GtMondrian new.
+	^m
+]

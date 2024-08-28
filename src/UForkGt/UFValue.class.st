@@ -4,35 +4,41 @@ Class {
 	#category : #UForkGt
 }
 
-{ #category : #'accessing - flags' }
-UFValue class >> Direct [
+{ #category : #'private - instance code' }
+UFValue class >> defineFlagAccesorFor: flagName mask: flagMask [
+	"Define accessors as class methods"
+	^flagName asLowercase, '
 	"This method was automatically generated"
-	^ Direct value
-]
-
-{ #category : #'accessing - flags' }
-UFValue class >> Mutable [
-	"This method was automatically generated"
-	^ Mutable value
-]
-
-{ #category : #'accessing - flags' }
-UFValue class >> Opaque [
-	"This method was automatically generated"
-	^ Opaque value
+	^ self bitAt:', (flagMask bitString findString: '1') asString.
 ]
 
 { #category : #'private - instance code' }
-UFValue class >> defineFlagClearAccesorFor: flagName [
-	| code |
-	
-	code := 'addNot', flagName, '
+UFValue class >> defineFlagSetAccesorFor: flagName mask: flagMask [
+	^'set', flagName, '
 	"This method was automatically generated"
-	value := value & (', flagName, ' value bitInvert)'.
+	^self & ', flagMask asString.
+]
 
-	self 
-		compile: code 
-		classified: self generatedFlagsClearProtocolName
+{ #category : #'private - instance code' }
+UFValue class >> defineFlagSetNotAccesorFor: flagName mask: flagMask [
+	^'setNot', flagName, '
+	"This method was automatically generated"
+	^self & ', flagMask bitInvert asString.
+]
+
+{ #category : #'private - instance code' }
+UFValue class >> defineFlagTestAccesorFor: flagName mask: flagMask [
+	^'is', flagName, '
+	"This method was automatically generated"
+	^ self & ', flagMask asString, ' ~= 0'.
+
+]
+
+{ #category : #'private - instance code' }
+UFValue class >> defineFlagTestNotAccesorFor: flagName mask: flagMask [
+	^'isNot', flagName, '
+	"This method was automatically generated"
+	^ self & ', flagMask bitInvert asString, ' ~= 0'.
 ]
 
 { #category : #'flags declaration' }
@@ -47,86 +53,13 @@ UFValue class >> flagsDecl [
 
 { #category : #initalization }
 UFValue class >> initialize [
-	super initialize
 ]
 
 { #category : #private }
 UFValue class >> rebuildFlagsAccessors [
-	self flagsDictionary keysDo: [ :each | 
-		self defineFlagAccesorFor: each.
-		self defineFlagTestAccesorFor: each.
-		self defineFlagClearAccesorFor: each.
-		self defineFlagAddAccesorFor: each ]
-]
-
-{ #category : #'flags - add' }
-UFValue >> addDirect [
-	"This method was automatically generated"
-	value := value | Direct value
-]
-
-{ #category : #'flags - add' }
-UFValue >> addMutable [
-	"This method was automatically generated"
-	value := value | Mutable value
-]
-
-{ #category : #'flags - clear' }
-UFValue >> addNotDirect [
-	"This method was automatically generated"
-	value := value & (Direct value bitInvert)
-]
-
-{ #category : #'flags - clear' }
-UFValue >> addNotMutable [
-	"This method was automatically generated"
-	value := value & (Mutable value bitInvert)
-]
-
-{ #category : #'flags - clear' }
-UFValue >> addNotOpaque [
-	"This method was automatically generated"
-	value := value & (Opaque value bitInvert)
-]
-
-{ #category : #'flags - add' }
-UFValue >> addOpaque [
-	"This method was automatically generated"
-	value := value | Opaque value
-]
-
-{ #category : #'flags - clear' }
-UFValue >> clearDirect [
-	"This method was automatically generated"
-	value := value & (Direct value bitInvert)
-]
-
-{ #category : #'flags - clear' }
-UFValue >> clearMutable [
-	"This method was automatically generated"
-	value := value & (Mutable value bitInvert)
-]
-
-{ #category : #'flags - clear' }
-UFValue >> clearOpaque [
-	"This method was automatically generated"
-	value := value & (Opaque value bitInvert)
-]
-
-{ #category : #'flags - testing' }
-UFValue >> hasDirect [
-	"This method was automatically generated"
-	^ (value & Direct value) ~= 0
-]
-
-{ #category : #'flags - testing' }
-UFValue >> hasMutable [
-	"This method was automatically generated"
-	^ (value & Mutable value) ~= 0
-]
-
-{ #category : #'flags - testing' }
-UFValue >> hasOpaque [
-	"This method was automatically generated"
-	^ (value & Opaque value) ~= 0
+	self flagsDictionary keysAndValuesDo: [ :flag :mask | 
+	|m|
+	m:=UFValue class methods select: [:me |me protocol = #'private - instance code'].
+	m do: [:met | SmallInteger compile: (UFValue perform: met selector with: flag with: mask) classified: #'*UForkGT']
+	]
 ]

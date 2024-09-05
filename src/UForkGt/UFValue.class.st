@@ -4,41 +4,52 @@ Class {
 	#category : #UForkGt
 }
 
+{ #category : #'private - protocol' }
+UFValue class >> accessProtocol [
+	^#'*UForkGT-access'
+]
+
+{ #category : #'private - protocol' }
+UFValue class >> clearProtocol [
+	^#'*UForkGT-clear'
+]
+
 { #category : #'private - instance code' }
-UFValue class >> defineFlagAccesorFor: flagName mask: flagMask [
+UFValue class >> defineFlagAccesFor: flagName mask: flagMask [
 	"Define accessors as class methods"
-	^flagName asLowercase, '
+	^(flagName asLowercase, '
 	"This method was automatically generated"
-	^ self bitAt:', (flagMask bitString findString: '1') asString.
+	^ self bitAt:', (flagMask bitString findString: '1') asString) -> self accessProtocol.
 ]
 
 { #category : #'private - instance code' }
-UFValue class >> defineFlagSetAccesorFor: flagName mask: flagMask [
-	^'set', flagName, '
+UFValue class >> defineFlagClearFor: flagName mask: flagMask [
+	^('setNot', flagName, '
 	"This method was automatically generated"
-	^self & ', flagMask asString.
+	^self & ', flagMask bitInvert asString) -> self clearProtocol.
 ]
 
 { #category : #'private - instance code' }
-UFValue class >> defineFlagSetNotAccesorFor: flagName mask: flagMask [
-	^'setNot', flagName, '
+UFValue class >> defineFlagSetFor: flagName mask: flagMask [
+	^('set', flagName, '
 	"This method was automatically generated"
-	^self & ', flagMask bitInvert asString.
+	^self & ', flagMask asString) -> self setProtocol.
 ]
 
 { #category : #'private - instance code' }
-UFValue class >> defineFlagTestAccesorFor: flagName mask: flagMask [
-	^'is', flagName, '
+UFValue class >> defineFlagTestAbsenceFor: flagName mask: flagMask [
+	^('is', flagName, '
 	"This method was automatically generated"
-	^ self & ', flagMask asString, ' ~= 0'.
+	^ self & ', flagMask asString, ' ~= 0') -> self testAbsenceProtocol.
 
 ]
 
 { #category : #'private - instance code' }
-UFValue class >> defineFlagTestNotAccesorFor: flagName mask: flagMask [
-	^'isNot', flagName, '
+UFValue class >> defineFlagTestPresenceFor: flagName mask: flagMask [
+	^ ('is' , flagName
+		, '
 	"This method was automatically generated"
-	^ self & ', flagMask bitInvert asString, ' ~= 0'.
+	^ self & ' , flagMask asString , ' ~= 0') -> self testPresenceProtocol
 ]
 
 { #category : #'flags declaration' }
@@ -57,9 +68,32 @@ UFValue class >> initialize [
 
 { #category : #private }
 UFValue class >> rebuildFlagsAccessors [
-	self flagsDictionary keysAndValuesDo: [ :flag :mask | 
-	|m|
-	m:=UFValue class methods select: [:me |me protocol = #'private - instance code'].
-	m do: [:met | SmallInteger compile: (UFValue perform: met selector with: flag with: mask) classified: #'*UForkGT']
-	]
+	self flagsDictionary
+		keysAndValuesDo: [ :flag :mask | 
+			| m |
+			m := UFValue class methods
+					select: [ :me | me protocol = #'private - instance code' ].
+			m
+				do: [ :met | 
+					| md |
+					md := UFValue
+							perform: met selector
+							with: flag
+							with: mask.
+					SmallInteger compile: md key classified: md value ] ]
+]
+
+{ #category : #'private - protocol' }
+UFValue class >> setProtocol [
+	^#'*UForkGT-set'
+]
+
+{ #category : #'private - protocol' }
+UFValue class >> testAbsenceProtocol [
+	^#'*UForkGT-absence'
+]
+
+{ #category : #'private - protocol' }
+UFValue class >> testPresenceProtocol [
+	^ #'*UForkGT-presence'
 ]

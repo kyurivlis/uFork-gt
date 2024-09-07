@@ -1,3 +1,6 @@
+"
+{{gtExample: UFValueExamples class>>titledTypeHierarchy|previewShow=gtLiveFor:|noCode}}
+"
 Class {
 	#name : #UFValue,
 	#superclass : #Object,
@@ -13,13 +16,19 @@ UFValue class >> accessProtocol [
 ]
 
 { #category : #'as yet unclassified' }
+UFValue class >> assignmentNode: aType [
+	^self typesDeclAst // RBAssignmentNode
+		detect: [ :n | n variable name = aType ].
+]
+
+{ #category : #'as yet unclassified' }
 UFValue class >> baseMaskFor: aName [ 
 ]
 
 { #category : #'as yet unclassified' }
 UFValue class >> baseTypeDictionary [
 	^(#(direct mutable opaque)
-			collect: [ :x | x -> ((self typeDecl tempNamed: x)
+			collect: [ :x | x -> ((self typesDecl tempNamed: x)
 									-> (self baseMaskFor: x))])
 	asOrderedDictionary.
 ]
@@ -27,6 +36,31 @@ UFValue class >> baseTypeDictionary [
 { #category : #private }
 UFValue class >> baseTypes [
 	^#(direct mutable opaque)
+]
+
+{ #category : #'as yet unclassified' }
+UFValue class >> baseTypesWithNegations [
+	^(self baseTypes) asOrderedCollection addAll: (self baseTypes collect:[:t|self negativeDecl: t]); yourself
+]
+
+{ #category : #'as yet unclassified' }
+UFValue class >> complexDeclTypes [
+	^ self declTypes difference: (self baseTypesWithNegations)
+]
+
+{ #category : #'as yet unclassified' }
+UFValue class >> complexTypes [
+	^ self declTypes difference: (self baseTypesWithNegations)
+]
+
+{ #category : #'as yet unclassified' }
+UFValue class >> declPredicates [
+	^(self declTypes) collect: [:t| SmallInteger methodNamed: t]
+]
+
+{ #category : #'as yet unclassified' }
+UFValue class >> declTypes [
+	^self typesDecl keys
 ]
 
 { #category : #'private - instance code' }
@@ -52,16 +86,6 @@ UFValue class >> defineTypeTestFor: aType tag: aTag mask: aMask [
 	^ self & ' , aMask  asString , ' = ', aTag asString) -> self testProtcol
 ]
 
-{ #category : #'flags declaration' }
-UFValue class >> flagsDecl [
-	"
-	self rebuildFlagsAccessors
-	"
-	^{#direct -> (0 bitAt: 32 put: 1).
-	  #mutable -> (0 bitAt: 31 put: 1).
-	  #opaque -> (0 bitAt: 30 put: 1)}
-]
-
 { #category : #initiailize }
 UFValue class >> initialize [
 	self typeDictionary
@@ -75,7 +99,7 @@ UFValue class >> isNegation: t of: aType [
 
 { #category : #private }
 UFValue class >> isNegative: aType [ 
-	^(self tagDecl: aType) matches: '& 0'
+	^(self typeDecl: aType) matches: '& 0'
 ]
 
 { #category : #private }
@@ -83,7 +107,7 @@ UFValue class >> mask: aType [
 	|mask maskSize |
 	(self baseTypes includes: aType) ifTrue: [ ^ self tag: aType ].
 	(self isNegative: aType) ifTrue: [ ^ self tag: (self negativeDecl: aType) ].
-	maskSize := ((self tagDecl: aType) allRegexMatches: '\|') size + 1.
+	maskSize := ((self typeDecl: aType) allRegexMatches: '\|') size + 1.
 	mask:= 0.
 	maskSize timesCollect: [:i| mask:= mask | (self mask:(self baseTypes at: i))].
 	^ mask
@@ -97,12 +121,12 @@ UFValue class >> methodMacros [
 
 { #category : #private }
 UFValue class >> negative: t of: aType [
-	^ (self isNegative: t) & ((self tagDecl: t) matches: aType)
+	^ (self isNegative: t) & ((self typeDecl: t) matches: aType)
 ]
 
 { #category : #private }
 UFValue class >> negativeDecl: aType [ 
-	^self typeDecl keys detect: [:t| self isNegation: t of: aType] ifNone: []
+	^self typesDecl keys detect: [:t| self isNegation: t of: aType] ifNone: []
 ]
 
 { #category : #private }
@@ -110,6 +134,11 @@ UFValue class >> negativeInfer: t [
 	(self negativeDecl: t) ifNil: [|m|
 		m := self mask: t.
 		self type: 'not' , t capitalized tag: ((self tag: t) bitInvert & m) mask: m]
+]
+
+{ #category : #'as yet unclassified' }
+UFValue class >> predicate: aType [
+	^self predicates detect: [:m| m selector = ('is', aType capitalized)]
 ]
 
 { #category : #'as yet unclassified' }
@@ -141,20 +170,12 @@ UFValue class >> setProtocol [
 
 { #category : #private }
 UFValue class >> tag: aType [
-	^self typeDecl at: aType
+	^self typesDecl at: aType
 ]
 
 { #category : #'private - bit manipulation' }
 UFValue class >> tagAt: anInteger [
 	^ 0 bitAt: anInteger put: 1
-]
-
-{ #category : #private }
-UFValue class >> tagDecl: aType [
-	| node |
-	node := (UFValue class >> #typeDecl) ast // RBAssignmentNode
-			detect: [ :n | n variable name = aType ].
-	^node value formattedCode
 ]
 
 { #category : #'private - protocol' }
@@ -183,8 +204,39 @@ UFValue class >> typeClass [
 	^SmallInteger
 ]
 
+{ #category : #private }
+UFValue class >> typeDecl: aType [
+	^(self assignmentNode: aType) value formattedCode
+]
+
+{ #category : #private }
+UFValue class >> typeDef: aType [
+	^(self tag: aType) -> (self mask: aType).
+]
+
+{ #category : #private }
+UFValue class >> typeDictionary [
+	types:= Dictionary new.
+	self typesDecl keys do: [:t|
+		types at: t put: (self typeDef: t).
+		self negativeInfer: t].
+	^types
+]
+
+{ #category : #'as yet unclassified' }
+UFValue class >> typeProtocols [
+	| m |
+	m := self protocolMethods.
+	^ m collect: [ :x | x valueWithReceiver: self arguments: #() ]
+]
+
+{ #category : #private }
+UFValue class >> types [
+	^types keys
+]
+
 { #category : #'flags declaration' }
-UFValue class >> typeDecl [
+UFValue class >> typesDecl [
 	"
 	self rebuildFlagsAccessors
 	"
@@ -204,28 +256,7 @@ UFValue class >> typeDecl [
 	
 ]
 
-{ #category : #private }
-UFValue class >> typeDef: aType [
-	^(self tag: aType) -> (self mask: aType).
-]
-
-{ #category : #private }
-UFValue class >> typeDictionary [
-	types:= Dictionary new.
-	self typeDecl keys do: [:t|
-		types at: t put: (self typeDef: t).
-		self negativeInfer: t].
-	^types
-]
-
 { #category : #'as yet unclassified' }
-UFValue class >> typeProtocols [
-	| m |
-	m := self protocolMethods.
-	^ m collect: [ :x | x valueWithReceiver: self arguments: #() ]
-]
-
-{ #category : #private }
-UFValue class >> types [
-	^types keys
+UFValue class >> typesDeclAst [
+	^(self class methodNamed: #typesDecl) ast
 ]

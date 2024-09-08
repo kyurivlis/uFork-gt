@@ -5,6 +5,11 @@ Class {
 	#category : #UForkGt
 }
 
+{ #category : #'instance creation' }
+UFFreeCell class >> next: next [ 
+	^self at: 4 put: next;  yourself
+]
+
 { #category : #'as yet unclassified' }
 UFFreeCell class >> structureDecl [
 	^#('free?' 'any?' 'any?' next)
@@ -12,10 +17,5 @@ UFFreeCell class >> structureDecl [
 
 { #category : #access }
 UFFreeCell >> next [
-	^self at: 4
-]
-
-{ #category : #access }
-UFFreeCell >> type [
-	^self at: 1
+^self at: 4
 ]

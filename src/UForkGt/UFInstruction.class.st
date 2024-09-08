@@ -5,6 +5,11 @@ Class {
 	#category : #UForkGt
 }
 
+{ #category : #'instance creation' }
+UFInstruction class >> opcode: opcode data: data next: next [ 
+	^self at: 2 put: opcode; at: 3 put: data; at: 4 put: next;  yourself
+]
+
 { #category : #'as yet unclassified' }
 UFInstruction class >> structureDecl [
 	^#('instr?' opcode data next)
@@ -12,20 +17,15 @@ UFInstruction class >> structureDecl [
 
 { #category : #access }
 UFInstruction >> data [
-	^self at: 3
+^self at: 3
 ]
 
 { #category : #access }
 UFInstruction >> next [
-	^self at: 4
+^self at: 4
 ]
 
 { #category : #access }
 UFInstruction >> opcode [
-	^self at: 2
-]
-
-{ #category : #access }
-UFInstruction >> type [
-	^self at: 1
+^self at: 2
 ]

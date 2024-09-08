@@ -5,6 +5,11 @@ Class {
 	#category : #UForkGt
 }
 
+{ #category : #'instance creation' }
+UFStackItem class >> item: item rest: rest [ 
+	^self at: 2 put: item; at: 3 put: rest;  yourself
+]
+
 { #category : #'as yet unclassified' }
 UFStackItem class >> structureDecl [
 	^#('pair?' item rest 'any?')
@@ -12,15 +17,10 @@ UFStackItem class >> structureDecl [
 
 { #category : #access }
 UFStackItem >> item [
-	^self at: 2
+^self at: 2
 ]
 
 { #category : #access }
 UFStackItem >> rest [
-	^self at: 3
-]
-
-{ #category : #access }
-UFStackItem >> type [
-	^self at: 1
+^self at: 3
 ]

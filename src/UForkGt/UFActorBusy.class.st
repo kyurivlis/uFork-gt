@@ -5,9 +5,14 @@ Class {
 	#category : #UForkGt
 }
 
+{ #category : #'instance creation' }
+UFActorBusy class >> beh: beh sp: sp [ 
+	^self at: 2 put: beh; at: 3 put: sp;  yourself
+]
+
 { #category : #access }
 UFActorBusy >> beh [
-	^self at: 2
+^self at: 2
 ]
 
 { #category : #access }
@@ -17,7 +22,7 @@ UFActorBusy >> effects [
 
 { #category : #access }
 UFActorBusy >> sp [
-	^self at: 3
+^self at: 3
 ]
 
 { #category : #access }
@@ -27,5 +32,5 @@ UFActorBusy >> third [
 
 { #category : #access }
 UFActorBusy >> type [
-	^self at: 1
+^self at: 1
 ]

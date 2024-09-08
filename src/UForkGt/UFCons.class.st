@@ -5,6 +5,11 @@ Class {
 	#category : #UForkGt
 }
 
+{ #category : #'instance creation' }
+UFCons class >> head: head tail: tail [ 
+	^self at: 2 put: head; at: 3 put: tail;  yourself
+]
+
 { #category : #'as yet unclassified' }
 UFCons class >> structureDecl [
 	^#('pair?' head tail 'any?')
@@ -12,15 +17,10 @@ UFCons class >> structureDecl [
 
 { #category : #access }
 UFCons >> head [
-	^self at: 2
+^self at: 2
 ]
 
 { #category : #access }
 UFCons >> tail [
-	^self at: 3
-]
-
-{ #category : #access }
-UFCons >> type [
-	^self at: 1
+^self at: 3
 ]

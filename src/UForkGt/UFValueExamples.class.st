@@ -1,6 +1,6 @@
 Class {
 	#name : #UFValueExamples,
-	#superclass : #UFValue,
+	#superclass : #Object,
 	#category : #UForkGt
 }
 
@@ -40,28 +40,35 @@ UFValueExamples class >> typeHierarchy [
 		stencil: [ :t | 
 			| c b l |
 			c := BrHorizontalFlow new fitContent.
-			b := (self complex: t) ifNotNil: [:na|
-				BrButton new beTinySize;
-					aptitude: BrGlamorousButtonWithLabelAptitude;
-					label: na;
-					action: [ :aBrButton | aBrButton phlow spawnObject: (UFValue assignmentNode: t)] ].
+			b := (self complex: t)
+					ifNotNil: [ :na | 
+						BrButton new
+							beTinySize;
+							aptitude: BrGlamorousButtonWithLabelAptitude;
+							label: na;
+							action: [ :aBrButton | aBrButton phlow spawnObject: (UFValue assignmentNode: t) ] ].
 			l := BrLabel new
 					aptitude: BrGlamorousLabelAptitude;
-					text: (t asRopedText ). 
-			c addChildren: ((UFValue isNegative: t) ifTrue: [{l . b} copyWithout: nil] ifFalse: [{b . l} copyWithout: nil])];
+					text: t asRopedText.
+			c
+				addChildren: ((UFValue isNegative: t)
+						ifTrue: [ {b.
+								l} copyWithout: nil ]
+						ifFalse: [ {l.
+								b} copyWithout: nil ]) ];
 		with: UFValue baseTypesWithNegations.
 	m nodes
-		stencil: [ :t| 
+		stencil: [ :t | 
 			BrLabel new
 				aptitude: BrGlamorousLabelAptitude;
-				text: t];
+				text: t ];
 		with: {'value'}.
 
 	m edges
-		"stencil: [:t :from :to| ((t = 'direct') | (t = 'indirect')) ifTrue: [GtMondrianEdgeBuilder new defaultEdgeElement] ifFalse: [	GtMondrianEdgeBuilder new defaultEdgeElement
-				fromAnchor: (BlElementBottomCenterAnchor element: ((from query / BrButton) anyOne));"
-			"	toAnchor: (BlElementTopCenterAnchor element: to)]];"
-	    connectFrom: [ :t | t ~= 'value' ifTrue: [ self parent: t ] ].
+		stencil: [ :t :from :to | 
+			| line  |
+			line := GtMondrianEdgeBuilder new defaultEdgeElement];
+		connectFrom: [ :t | t ~= 'value' ifTrue: [ self parent: t ] ].
 	m layout tree.
 	^ m
 ]

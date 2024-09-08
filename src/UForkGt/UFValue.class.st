@@ -40,7 +40,7 @@ UFValue class >> baseTypes [
 
 { #category : #'as yet unclassified' }
 UFValue class >> baseTypesWithNegations [
-	^(self baseTypes) asOrderedCollection addAll: (self baseTypes collect:[:t|self negativeDecl: t]); yourself
+	^(self baseTypes) asOrderedCollection addAllFirst: (self baseTypes collect:[:t|self negativeDecl: t]); yourself
 ]
 
 { #category : #'as yet unclassified' }
@@ -241,9 +241,9 @@ UFValue class >> typesDecl [
 	self rebuildFlagsAccessors
 	"
 	|direct mutable opaque indirect immutable transparent ptr fixnum rom ram ocap|
-	direct:= self tagAt: 32.
-	mutable:=self tagAt: 31.
-	opaque:=self tagAt: 30.
+	direct:= self tagAt: 0.
+	mutable:=self tagAt: 1.
+	opaque:=self tagAt: 2.
 	indirect:= direct &0.
 	immutable:=mutable &0.
 	transparent:=opaque &0.
